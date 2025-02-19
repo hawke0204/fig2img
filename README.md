@@ -4,3 +4,4 @@
 
 - Figma image nodes downloading
 - PNG -> Webp converting
+- PNG -> AVIF converting
