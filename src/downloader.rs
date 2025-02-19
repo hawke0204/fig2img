@@ -1,14 +1,23 @@
-use std::error;
-use std::fs::File;
-use std::io::Write;
+use std::error::Error;
+
+use reqwest::Client;
+use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
 
 pub struct ImageDownloader;
 
 impl ImageDownloader {
-  pub fn download_image(url: &str, filename: &str) -> Result<(), Box<dyn error::Error>> {
-    let response = reqwest::blocking::get(url)?;
-    let mut file = File::create(filename)?;
-    file.write_all(&response.bytes()?)?;
+  pub async fn download_image(
+    image_url: &str,
+    filename: &str,
+  ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let client = Client::new();
+    let response = client.get(image_url).send().await?;
+    let bytes = response.bytes().await?;
+
+    let mut file = File::create(filename).await?;
+    file.write_all(&bytes).await?;
+
     Ok(())
   }
 }

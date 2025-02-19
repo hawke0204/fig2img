@@ -1,4 +1,4 @@
-use reqwest::blocking::Client;
+use reqwest::Client;
 use serde_json::{Map, Value};
 
 use crate::config::FigmaConfig;
@@ -6,7 +6,7 @@ use crate::config::FigmaConfig;
 pub struct FigmaImageExtractor;
 
 impl FigmaImageExtractor {
-  pub fn fetch_figma_images() -> Result<Option<Map<String, Value>>, reqwest::Error> {
+  pub async fn fetch_figma_images() -> Result<Option<Map<String, Value>>, reqwest::Error> {
     let FigmaConfig {
       figma_access_token,
       figma_api_url,
@@ -21,11 +21,13 @@ impl FigmaImageExtractor {
       .get(&file_url)
       .query(&[
         ("format", "png"),
-        ("ids", &Self::get_image_node_ids().join(",")),
+        ("ids", &Self::get_image_node_ids().await.join(",")),
       ])
       .header("X-Figma-Token", figma_access_token)
-      .send()?
-      .text()?;
+      .send()
+      .await?
+      .text()
+      .await?;
 
     let response: Value = serde_json::from_str(&response).unwrap();
     let images = response["images"].as_object();
@@ -33,7 +35,7 @@ impl FigmaImageExtractor {
     Ok(images.cloned())
   }
 
-  fn get_image_node_ids() -> Vec<String> {
+  async fn get_image_node_ids() -> Vec<String> {
     let FigmaConfig {
       figma_access_token,
       figma_api_url,
@@ -48,8 +50,10 @@ impl FigmaImageExtractor {
       .get(&file_url)
       .header("X-Figma-Token", figma_access_token)
       .send()
+      .await
       .unwrap()
       .text()
+      .await
       .unwrap();
 
     let response: Value = serde_json::from_str(&response).unwrap();
