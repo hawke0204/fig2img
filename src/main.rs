@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use clap::Parser;
 use futures::future;
 use tokio::fs;
+use tokio::sync::Semaphore;
 
 mod cli;
 mod config;
@@ -63,7 +66,7 @@ async fn main() {
       output_dir,
       format,
     } => {
-      if format != "webp" {
+      if format != "webp" && format != "avif" {
         eprintln!("[❌]Unsupported format: {}", format);
         return;
       }
@@ -81,19 +84,32 @@ async fn main() {
       match fs::read_dir(&input_dir).await {
         Ok(mut entries) => {
           let mut conversion_tasks = Vec::new();
+          let semaphore = Arc::new(Semaphore::new(4));
 
           while let Some(entry) = entries.next_entry().await.unwrap() {
             let path = entry.path();
+
             if path.extension().map_or(false, |ext| ext == "png") {
               let file_stem = path.file_stem().unwrap().to_str().unwrap().to_string();
               let output_path = output_dir.join(format!("{}.{}", &file_stem, format));
 
               let input_path = path.to_str().unwrap().to_string();
-              let output_path_str = output_path.to_str().unwrap().to_string();
+              let output_path = output_path.to_str().unwrap().to_string();
+              let format = format.clone();
+
+              let semaphore = Arc::clone(&semaphore);
 
               conversion_tasks.push(tokio::spawn(async move {
-                match ImageConverter::convert_to_webp(&input_path, &output_path_str) {
-                  Ok(_) => println!("[✅]Converted: {} -> {}", input_path, output_path_str),
+                let _ = semaphore.acquire().await.unwrap();
+
+                let result = match format.as_str() {
+                  "webp" => ImageConverter::convert_to_webp(&input_path, &output_path).await,
+                  "avif" => ImageConverter::convert_to_avif(&input_path, &output_path).await,
+                  _ => unreachable!(),
+                };
+
+                match result {
+                  Ok(_) => println!("[✅]Converted: {} -> {}", input_path, output_path),
                   Err(e) => eprintln!("[❌]Failed conversion: {}", e),
                 }
               }));
