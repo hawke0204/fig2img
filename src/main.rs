@@ -68,7 +68,11 @@ fn main() {
                   path.to_str().unwrap(),
                   output_path.to_str().unwrap(),
                 ) {
-                  Ok(_) => println!("✅ Converted: {}", output_path.display()),
+                  Ok(_) => println!(
+                    "✅ Converted: {} -> {}",
+                    path.display(),
+                    output_path.display()
+                  ),
                   Err(e) => eprintln!("❌ Conversion failed: {}", e),
                 }
               }
