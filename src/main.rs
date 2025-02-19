@@ -1,5 +1,5 @@
 use clap::Parser;
-use futures::future::try_join_all;
+use futures::future::{join_all, try_join_all};
 use tokio::fs;
 
 mod cli;
@@ -19,13 +19,11 @@ async fn main() {
 
   match cli.command {
     Commands::Download { download_dir } => {
-      // Create download directory
       if let Err(e) = fs::create_dir_all(&download_dir).await {
         eprintln!("[❌]Failed to create download directory: {}", e);
         return;
       }
 
-      // Fetch and download images
       match FigmaImageExtractor::fetch_figma_images().await {
         Ok(Some(images)) => {
           let downloads = images
@@ -77,24 +75,32 @@ async fn main() {
 
       match fs::read_dir(&input_dir).await {
         Ok(mut entries) => {
+          let mut conversion_tasks = Vec::new();
+
           while let Some(entry) = entries.next_entry().await.unwrap() {
             let path = entry.path();
             if path.extension().map_or(false, |ext| ext == "png") {
-              let file_stem = path.file_stem().unwrap().to_str().unwrap();
-              let output_path = output_dir.join(format!("{}.{}", file_stem, format));
+              let file_stem = path.file_stem().unwrap().to_str().unwrap().to_string();
+              let output_path = output_dir.join(format!("{}.{}", &file_stem, format));
 
-              match ImageConverter::convert_to_webp(
-                path.to_str().unwrap(),
-                output_path.to_str().unwrap(),
-              ) {
-                Ok(_) => println!(
-                  "[✅]Converted: {} -> {}",
-                  path.display(),
-                  output_path.display()
-                ),
-                Err(e) => eprintln!("[❌]Failed conversion: {}", e),
-              }
+              let input_path = path.to_str().unwrap().to_string();
+              let output_path_str = output_path.to_str().unwrap().to_string();
+
+              conversion_tasks.push(tokio::spawn(async move {
+                match ImageConverter::convert_to_webp(&input_path, &output_path_str) {
+                  Ok(_) => println!("[✅]Converted: {} -> {}", input_path, output_path_str),
+                  Err(e) => eprintln!("[❌]Failed conversion: {}", e),
+                }
+              }));
             }
+          }
+
+          if let Err(e) = join_all(conversion_tasks)
+            .await
+            .into_iter()
+            .collect::<Result<Vec<_>, _>>()
+          {
+            eprintln!("[❌]Some conversions failed: {}", e);
           }
         }
         Err(e) => eprintln!("[❌]Failed to read input directory: {}", e),
