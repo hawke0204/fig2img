@@ -21,7 +21,7 @@ async fn main() {
     Commands::Download { download_dir } => {
       // Create download directory
       if let Err(e) = fs::create_dir_all(&download_dir).await {
-        eprintln!("❌ Failed to create download directory: {}", e);
+        eprintln!("[❌]Failed to create download directory: {}", e);
         return;
       }
 
@@ -39,7 +39,7 @@ async fn main() {
                 async move {
                   match ImageDownloader::download_image(&url, &png_path).await {
                     Ok(_) => {
-                      println!("✅ Downloaded: {}", png_path);
+                      println!("[✅]Downloaded: {}", png_path);
                       Ok(())
                     }
                     Err(e) => {
@@ -53,11 +53,11 @@ async fn main() {
             .collect::<Vec<_>>();
 
           if let Err(e) = try_join_all(downloads).await {
-            eprintln!("❌ Some downloads failed: {}", e);
+            eprintln!("[❌]Some downloads failed: {}", e);
           }
         }
         Ok(None) => println!("✅ No images found."),
-        Err(e) => eprintln!("❌ Failed to request figma API: {}", e),
+        Err(e) => eprintln!("[❌]Failed to request figma API: {}", e),
       }
     }
     Commands::Convert {
@@ -65,13 +65,16 @@ async fn main() {
       output_dir,
       format,
     } => {
-      // Create output directory
-      if let Err(e) = fs::create_dir_all(&output_dir).await {
-        eprintln!("❌ Failed to create output directory: {}", e);
+      if format == "webp" && !ImageConverter::check_cwebp_installed() {
+        ImageConverter::print_installation_guide();
         return;
       }
 
-      // Read PNG files from input directory
+      if let Err(e) = fs::create_dir_all(&output_dir).await {
+        eprintln!("[❌]Failed to create output directory: {}", e);
+        return;
+      }
+
       match fs::read_dir(&input_dir).await {
         Ok(mut entries) => {
           while let Some(entry) = entries.next_entry().await.unwrap() {
@@ -85,16 +88,16 @@ async fn main() {
                 output_path.to_str().unwrap(),
               ) {
                 Ok(_) => println!(
-                  "✅ Converted: {} -> {}",
+                  "[✅]Converted: {} -> {}",
                   path.display(),
                   output_path.display()
                 ),
-                Err(e) => eprintln!("❌ Failed conversion: {}", e),
+                Err(e) => eprintln!("[❌]Failed conversion: {}", e),
               }
             }
           }
         }
-        Err(e) => eprintln!("❌ Failed to read input directory: {}", e),
+        Err(e) => eprintln!("[❌]Failed to read input directory: {}", e),
       }
     }
   }
