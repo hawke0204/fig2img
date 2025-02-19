@@ -1,5 +1,13 @@
-/target
-config.toml
+# VSCode settings
 .vscode
+
+# Build output
+dist
+target
+
+# Config
+config.toml
+
+# Execute output
 output
-download
+downloads
