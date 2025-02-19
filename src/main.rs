@@ -1,5 +1,5 @@
 use clap::Parser;
-use futures::future::{join_all, try_join_all};
+use futures::future;
 use tokio::fs;
 
 mod cli;
@@ -50,7 +50,7 @@ async fn main() {
             })
             .collect::<Vec<_>>();
 
-          if let Err(e) = try_join_all(downloads).await {
+          if let Err(e) = future::try_join_all(downloads).await {
             eprintln!("[❌]Some downloads failed: {}", e);
           }
         }
@@ -63,6 +63,11 @@ async fn main() {
       output_dir,
       format,
     } => {
+      if format != "webp" {
+        eprintln!("[❌]Unsupported format: {}", format);
+        return;
+      }
+
       if format == "webp" && !ImageConverter::check_cwebp_installed() {
         ImageConverter::print_installation_guide();
         return;
@@ -95,7 +100,7 @@ async fn main() {
             }
           }
 
-          if let Err(e) = join_all(conversion_tasks)
+          if let Err(e) = future::join_all(conversion_tasks)
             .await
             .into_iter()
             .collect::<Result<Vec<_>, _>>()
