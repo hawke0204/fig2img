@@ -31,9 +31,11 @@ async fn main() {
         Ok(Some(images)) => {
           let downloads = images
             .into_iter()
-            .filter_map(|(node_id, image_url)| {
+            .filter_map(|(_node_id, image_url, name)| {
               image_url.as_str().map(|url| {
-                let png_filename = download_dir.join(format!("{}.png", node_id));
+                let sanitized_name =
+                  name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+                let png_filename = download_dir.join(format!("{}.png", sanitized_name));
                 let png_path = png_filename.to_str().unwrap().to_string();
                 let url = url.to_string();
 
