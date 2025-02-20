@@ -13,7 +13,6 @@ Create a `config.toml` file in the root directory.
 ```toml
 // config.toml
 figma_access_token = "TOKEN"
-figma_api_url = "URL"
 figma_file_key = "KEY"
 ```
 

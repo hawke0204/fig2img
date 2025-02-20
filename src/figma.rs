@@ -6,16 +6,17 @@ use crate::config::FigmaConfig;
 pub struct FigmaImageExtractor;
 
 impl FigmaImageExtractor {
+  const API_URL: &'static str = "https://api.figma.com/v1";
+
   pub async fn fetch_figma_images() -> Result<Option<Map<String, Value>>, reqwest::Error> {
     let FigmaConfig {
       figma_access_token,
-      figma_api_url,
       figma_file_key,
       ..
     } = FigmaConfig::new();
 
     let client = Client::new();
-    let file_url = format!("{}/images/{}", figma_api_url, figma_file_key);
+    let file_url = format!("{}/images/{}", Self::API_URL, figma_file_key);
 
     let response = client
       .get(&file_url)
@@ -38,13 +39,12 @@ impl FigmaImageExtractor {
   async fn get_image_node_ids() -> Vec<String> {
     let FigmaConfig {
       figma_access_token,
-      figma_api_url,
       figma_file_key,
       ..
     } = FigmaConfig::new();
 
     let client = Client::new();
-    let file_url = format!("{}/files/{}", figma_api_url, figma_file_key);
+    let file_url = format!("{}/files/{}", Self::API_URL, figma_file_key);
 
     let response = client
       .get(&file_url)

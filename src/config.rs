@@ -4,9 +4,9 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct FigmaConfig {
   pub figma_access_token: String,
-  pub figma_api_url: String,
   pub figma_file_key: String,
   // [Deprecated]
+  // pub figma_api_url: String,
   // pub download_folder: String,
   // pub output_folder: String,
 }
