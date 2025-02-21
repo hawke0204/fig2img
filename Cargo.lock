@@ -876,6 +876,7 @@ dependencies = [
  "rgb",
  "serde",
  "serde_json",
+ "tempfile",
  "tokio",
 ]
 

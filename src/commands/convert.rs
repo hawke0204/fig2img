@@ -10,17 +10,12 @@ use crate::core::converter;
 
 pub async fn execute(input_dir: PathBuf, output_dir: PathBuf, format: String) {
   if format != "webp" && format != "avif" {
-    eprintln!("[❌]Unsupported format: {}", format);
-    return;
-  }
-
-  if format == "webp" && !ImageConverter::check_cwebp_installed() {
-    ImageConverter::print_installation_guide();
+    eprintln!("[❌] Unsupported format: {}", format);
     return;
   }
 
   if let Err(e) = fs::create_dir_all(&output_dir).await {
-    eprintln!("[❌]Failed to create output directory: {}", e);
+    eprintln!("[❌] Failed to create output directory: {}", e);
     return;
   }
 
@@ -52,8 +47,8 @@ pub async fn execute(input_dir: PathBuf, output_dir: PathBuf, format: String) {
             };
 
             match result {
-              Ok(_) => println!("[✅]Converted: {} -> {}", input_path, output_path),
-              Err(e) => eprintln!("[❌]Failed conversion: {}", e),
+              Ok(_) => println!("[✅] Converted: {} -> {}", input_path, output_path),
+              Err(e) => eprintln!("[❌] Failed conversion: {}", e),
             }
           }));
         }
@@ -64,9 +59,9 @@ pub async fn execute(input_dir: PathBuf, output_dir: PathBuf, format: String) {
         .into_iter()
         .collect::<Result<Vec<_>, _>>()
       {
-        eprintln!("[❌]Some conversions failed: {}", e);
+        eprintln!("[❌] Some conversions failed: {}", e);
       }
     }
-    Err(e) => eprintln!("[❌]Failed to read input directory: {}", e),
+    Err(e) => eprintln!("[❌] Failed to read input directory: {}", e),
   }
 }
