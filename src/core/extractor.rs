@@ -73,7 +73,6 @@ impl FigmaImageExtractor {
   }
 
   async fn get_image_nodes(&self) -> Result<Vec<(String, String)>, reqwest::Error> {
-    // Generate files URL using build_url
     let file_url = self.build_url("files");
     let response = self
       .client

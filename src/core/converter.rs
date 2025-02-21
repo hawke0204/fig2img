@@ -47,7 +47,6 @@ impl ImageConverter {
     let input_file = input_file.to_string();
     let output_file = output_file.to_string();
 
-    // Run CPU-intensive operations in a blocking thread
     let encoded = tokio::task::spawn_blocking(move || {
       let img = image::open(&input_file).map_err(|e| {
         Error::new(
