@@ -8,13 +8,11 @@ use tokio::fs;
 use crate::core::{downloader, extractor};
 
 pub async fn execute(download_dir: PathBuf) {
-  // Create download directory
   if let Err(e) = fs::create_dir_all(&download_dir).await {
     eprintln!("[❌]Failed to create download directory: {}", e);
     return;
   }
 
-  // Fetch images and process downloads
   match FigmaImageExtractor::fetch_figma_images().await {
     Ok(Some(images)) => {
       let downloads = images
