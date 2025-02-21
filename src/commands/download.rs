@@ -3,8 +3,10 @@ use std::path::PathBuf;
 use downloader::ImageDownloader;
 use extractor::FigmaImageExtractor;
 use futures::future;
+use reqwest::Client;
 use tokio::fs;
 
+use crate::config::FigmaConfig;
 use crate::core::{downloader, extractor};
 
 pub async fn execute(download_dir: PathBuf) {
@@ -13,7 +15,10 @@ pub async fn execute(download_dir: PathBuf) {
     return;
   }
 
-  match FigmaImageExtractor::fetch_figma_images().await {
+  let config = FigmaConfig::new();
+  let extractor = FigmaImageExtractor::new(Client::new(), config);
+
+  match extractor.fetch_figma_images().await {
     Ok(Some(images)) => {
       let downloads = images
         .into_iter()
