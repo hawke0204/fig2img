@@ -7,7 +7,7 @@ use tokio::io::AsyncWriteExt;
 pub struct ImageDownloader;
 
 impl ImageDownloader {
-  pub async fn download_image(
+  pub async fn download(
     image_url: &str,
     filename: &str,
   ) -> Result<(), Box<dyn Error + Send + Sync>> {

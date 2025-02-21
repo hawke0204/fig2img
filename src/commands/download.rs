@@ -18,7 +18,7 @@ pub async fn execute(download_dir: PathBuf) {
   let config = FigmaConfig::new();
   let extractor = FigmaImageExtractor::new(Client::new(), config);
 
-  match extractor.fetch_figma_images().await {
+  match extractor.extract().await {
     Ok(images) => {
       let downloads = images
         .into_iter()
@@ -30,7 +30,7 @@ pub async fn execute(download_dir: PathBuf) {
             let url = url.to_string();
 
             async move {
-              match ImageDownloader::download_image(&url, &png_path).await {
+              match ImageDownloader::download(&url, &png_path).await {
                 Ok(_) => {
                   println!("[✅]Downloaded: {}", png_path);
                   Ok(())

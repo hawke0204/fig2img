@@ -34,7 +34,7 @@ impl FigmaImageExtractor {
     )
   }
 
-  pub async fn fetch_figma_images(&self) -> Result<Vec<(String, Value, String)>, reqwest::Error> {
+  pub async fn extract(&self) -> Result<Vec<(String, Value, String)>, reqwest::Error> {
     let file_url = self.build_url("images");
     let image_nodes = self.get_image_nodes().await?;
     let ids = image_nodes
@@ -148,7 +148,7 @@ mod tests {
   use super::*;
 
   #[tokio::test]
-  async fn test_fetch_figma_images() {
+  async fn test_extract() {
     let server = MockServer::start();
 
     let file_mock = server.mock(|when, then| {
@@ -194,7 +194,7 @@ mod tests {
 
     let extractor = FigmaImageExtractor::with_api_url(Client::new(), config, server.base_url());
 
-    let images = extractor.fetch_figma_images().await.unwrap();
+    let images = extractor.extract().await.unwrap();
 
     file_mock.assert();
     images_mock.assert();
