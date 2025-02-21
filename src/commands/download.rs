@@ -19,7 +19,7 @@ pub async fn execute(download_dir: PathBuf) {
   let extractor = FigmaImageExtractor::new(Client::new(), config);
 
   match extractor.fetch_figma_images().await {
-    Ok(Some(images)) => {
+    Ok(images) => {
       let downloads = images
         .into_iter()
         .filter_map(|(_node_id, image_url, name)| {
@@ -49,7 +49,7 @@ pub async fn execute(download_dir: PathBuf) {
         eprintln!("[❌]Some downloads failed: {}", e);
       }
     }
-    Ok(None) => println!("✅ No images found."),
+    // Ok(None) => println!("✅ No images found."),
     Err(e) => eprintln!("[❌]Failed to request figma API: {}", e),
   }
 }

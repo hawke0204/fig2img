@@ -19,7 +19,7 @@ impl FigmaImageExtractor {
   }
 
   #[cfg(test)]
-  pub fn with_api_url(client: Client, config: FigmaConfig, api_url: String) -> Self {
+  fn with_api_url(client: Client, config: FigmaConfig, api_url: String) -> Self {
     Self {
       client,
       config,
@@ -34,9 +34,7 @@ impl FigmaImageExtractor {
     )
   }
 
-  pub async fn fetch_figma_images(
-    &self,
-  ) -> Result<Option<Vec<(String, Value, String)>>, reqwest::Error> {
+  pub async fn fetch_figma_images(&self) -> Result<Vec<(String, Value, String)>, reqwest::Error> {
     let file_url = self.build_url("images");
     let image_nodes = self.get_image_nodes().await?;
     let ids = image_nodes
@@ -55,24 +53,27 @@ impl FigmaImageExtractor {
       .json::<Value>()
       .await?;
 
-    let images = response["images"].as_object();
+    let images = response["images"]
+      .as_object()
+      .map(|imgs| {
+        imgs
+          .iter()
+          .filter_map(|(id, url)| {
+            let name = image_nodes
+              .iter()
+              .find(|(node_id, _)| node_id == id)
+              .map(|(_, name)| name.clone())?;
+            Some((id.clone(), url.clone(), name))
+          })
+          .collect()
+      })
+      .unwrap_or_default();
 
-    Ok(images.map(|imgs| {
-      imgs
-        .iter()
-        .filter_map(|(id, url)| {
-          let name = image_nodes
-            .iter()
-            .find(|(node_id, _)| node_id == id)
-            .map(|(_, name)| name.clone())?;
-          Some((id.clone(), url.clone(), name))
-        })
-        .collect()
-    }))
+    Ok(images)
   }
 
   async fn get_image_nodes(&self) -> Result<Vec<(String, String)>, reqwest::Error> {
-    // build_url으로 files URL 생성
+    // Generate files URL using build_url
     let file_url = self.build_url("files");
     let response = self
       .client
@@ -116,7 +117,6 @@ impl FigmaImageExtractor {
       }
     }
 
-    image_nodes.reverse(); // 결과 리스트를 뒤집어서 반환
     image_nodes
   }
 
@@ -194,13 +194,11 @@ mod tests {
 
     let extractor = FigmaImageExtractor::with_api_url(Client::new(), config, server.base_url());
 
-    let result = extractor.fetch_figma_images().await.unwrap();
+    let images = extractor.fetch_figma_images().await.unwrap();
 
     file_mock.assert();
     images_mock.assert();
 
-    assert!(result.is_some());
-    let images = result.unwrap();
     assert_eq!(images.len(), 1);
     assert_eq!(images[0].0, "1:1");
     assert_eq!(
@@ -297,8 +295,8 @@ mod tests {
 
     let nodes = FigmaImageExtractor::extract_image_nodes(&document);
     assert_eq!(nodes.len(), 2);
-    assert_eq!(nodes[0], ("1:1".to_string(), "test_image1".to_string()));
-    assert_eq!(nodes[1], ("1:3".to_string(), "test_image2".to_string()));
+    assert_eq!(nodes[0], ("1:3".to_string(), "test_image2".to_string()));
+    assert_eq!(nodes[1], ("1:1".to_string(), "test_image1".to_string()));
   }
 
   #[tokio::test]
