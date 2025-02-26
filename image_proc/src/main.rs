@@ -1,13 +1,9 @@
 use clap::Parser;
 
 mod cli;
-mod commands;
-
-mod config;
-mod core;
-mod utils;
 
 use cli::{Cli, Commands};
+use image_proc::commands;
 
 #[tokio::main]
 async fn main() {

@@ -1,28 +1,30 @@
-# Figma image tool
+# Figma Image Processing
 
 ### Features
 
-- Figma image nodes downloading
-- PNG -> Webp converting
-- PNG -> AVIF converting
+- Download Figma image nodes
+- Convert PNG to WebP
+- Convert PNG to AVIF
 
-### Developer Guide
+### Getting Started
 
-Create a `config.toml` file in the root directory.
+Create a `config.toml` file in the root directory:
 
 ```toml
 figma_access_token = "TOKEN"
 figma_file_key = "KEY"
 ```
 
-#### Download image nodes
+### Usage
+
+#### Download Images
 
 ```bash
 cargo run download
 cargo run download --download_dir ./downloads
 ```
 
-#### Convert image
+#### Convert Images
 
 ```bash
 cargo run convert --format webp

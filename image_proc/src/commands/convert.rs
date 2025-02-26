@@ -1,12 +1,11 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use converter::ImageConverter;
 use futures::future;
 use tokio::fs;
 use tokio::sync::Semaphore;
 
-use crate::core::converter;
+use crate::core::converter::ImageConverter;
 
 pub async fn execute(input_dir: PathBuf, output_dir: PathBuf, format: String) {
   if format != "webp" && format != "avif" {
