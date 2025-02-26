@@ -8,7 +8,25 @@ async fn main() {
 
   let start = Instant::now();
   commands::download::execute(path).await;
-  let duration = start.elapsed();
+  let download_duration = start.elapsed();
 
-  println!("Download execution took: {:?}", duration);
+  let input_path = std::path::PathBuf::from("./downloads");
+  let output_path = std::path::PathBuf::from("./output");
+  let format = "webp".to_string();
+
+  let start = Instant::now();
+  commands::convert::execute(input_path, output_path, format).await;
+  let convert_to_webp_duration = start.elapsed();
+
+  println!(
+    "Download execution took: {:.2}s",
+    download_duration.as_secs_f64()
+  );
+  println!(
+    "Convert to webp execution took: {:.2}s",
+    convert_to_webp_duration.as_secs_f64()
+  );
+
+  let all_duration = download_duration + convert_to_webp_duration;
+  println!("Total execution took: {:.2}s", all_duration.as_secs_f64());
 }
