@@ -3,7 +3,8 @@ use clap::Parser;
 mod cli;
 
 use cli::{Cli, Commands};
-use image_proc::commands;
+use image_proc::commands::download::DownloadOptions;
+use image_proc::commands::{self};
 
 #[tokio::main]
 async fn main() {
@@ -11,7 +12,7 @@ async fn main() {
 
   match cli.command {
     Commands::Download { download_dir } => {
-      commands::download::execute(download_dir).await;
+      commands::download::execute(download_dir, DownloadOptions::default()).await;
     }
     Commands::Convert {
       input_dir,

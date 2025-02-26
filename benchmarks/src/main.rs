@@ -1,13 +1,16 @@
 use std::time::Instant;
 
-use image_proc::commands;
+use image_proc::commands::download::DownloadOptions;
+use image_proc::commands::{self};
 
 #[tokio::main]
 async fn main() {
   let path = std::path::PathBuf::from("./downloads");
 
   let start = Instant::now();
-  commands::download::execute(path).await;
+  let options = DownloadOptions::new().quiet(true);
+
+  commands::download::execute(path, options).await;
   let download_duration = start.elapsed();
 
   let input_path = std::path::PathBuf::from("./downloads");
