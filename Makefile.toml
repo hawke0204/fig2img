@@ -1,0 +1,22 @@
+[tasks.get-version]
+script = '''
+export VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="fig2img") | .version')
+echo $VERSION > VERSION
+'''
+
+[tasks.build]
+command = "cargo"
+args = ["build", "--release", "-p", "fig2img"]
+
+[tasks.compress]
+script = '''
+VERSION=$(cat VERSION)
+tar -czvf fig2img-macos-$VERSION.tar.gz -C target/release fig2img
+'''
+
+[tasks.release]
+dependencies = ["get-version", "build", "compress"]
+script = '''
+VERSION=$(cat VERSION)
+gh release create $VERSION fig2img-macos-$VERSION.tar.gz --notes "Release notes here"
+'''
