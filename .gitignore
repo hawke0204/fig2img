@@ -4,6 +4,8 @@
 # Build output
 dist
 target
+fig2img-*-*.tar.gz
+VERSION
 
 # Config
 config.toml

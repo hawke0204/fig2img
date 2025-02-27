@@ -1,3 +1,6 @@
+[config]
+default_to_workspace = false
+
 [tasks.get-version]
 script = '''
 export VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="fig2img") | .version')
@@ -19,4 +22,11 @@ dependencies = ["get-version", "build", "compress"]
 script = '''
 VERSION=$(cat VERSION)
 gh release create $VERSION fig2img-macos-$VERSION.tar.gz --notes "Release notes here"
+'''
+
+[tasks.cleanup]
+script = '''
+VERSION=$(cat VERSION)
+rm -f VERSION
+rm -f fig2img-macos-$VERSION.tar.gz
 '''
