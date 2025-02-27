@@ -1,16 +1,16 @@
 [package]
-name = "image_proc"
+name = "fig2img"
 version = "0.0.1"
 edition = "2021"
 description = "A tool for processing images"
 license = "MIT"
 
 [[bin]]
-name = "image_proc"
+name = "fig2img"
 path = "src/main.rs"
 
 [lib]
-name = "image_proc"
+name = "fig2img"
 path = "src/lib.rs"
 
 [dependencies]

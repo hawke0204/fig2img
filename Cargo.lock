@@ -407,7 +407,7 @@ dependencies = [
 name = "benchmarks"
 version = "0.1.0"
 dependencies = [
- "image_proc",
+ "fig2img",
  "tokio",
 ]
 
@@ -868,6 +868,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e6853b52649d4ac5c0bd02320cddc5ba956bdb407c4b75a2c6b75bf51500f8c"
 dependencies = [
  "simd-adler32",
+]
+
+[[package]]
+name = "fig2img"
+version = "0.0.1"
+dependencies = [
+ "clap",
+ "config",
+ "futures",
+ "httpmock",
+ "image",
+ "ravif",
+ "reqwest",
+ "rgb",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
 ]
 
 [[package]]
@@ -1505,24 +1523,6 @@ checksum = "b77d01e822461baa8409e156015a1d91735549f0f2c17691bd2d996bef238f7f"
 dependencies = [
  "byteorder-lite",
  "quick-error",
-]
-
-[[package]]
-name = "image_proc"
-version = "0.0.1"
-dependencies = [
- "clap",
- "config",
- "futures",
- "httpmock",
- "image",
- "ravif",
- "reqwest",
- "rgb",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
 ]
 
 [[package]]

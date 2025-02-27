@@ -1,4 +1,4 @@
-# Figma Image Processing
+# Figma To Image
 
 ### Features
 
@@ -8,11 +8,13 @@
 
 ### Getting Started
 
-Create a `config.toml` file in the root directory:
+Set up your environment variables:
 
-```toml
-figma_access_token = "TOKEN"
-figma_file_key = "KEY"
+```bash
+# fig2img
+export FIGMA_ACCESS_TOKEN="YOUR_ACCESS_TOKEN"
+export FIGMA_FILE_KEY="YOUR_FILE_KEY"
+# fig2img end
 ```
 
 ### Usage
@@ -20,13 +22,12 @@ figma_file_key = "KEY"
 #### Download Images
 
 ```bash
-cargo run download
-cargo run download --download_dir ./downloads
+fig2img download --download_dir ./downloads
 ```
 
 #### Convert Images
 
 ```bash
-cargo run convert --format webp
-cargo run convert --format avif
+fig2img convert --format webp
+fig2img convert --format avif
 ```

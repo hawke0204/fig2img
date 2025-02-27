@@ -1,7 +1,7 @@
 use std::time::Instant;
 
-use image_proc::commands::download::DownloadOptions;
-use image_proc::commands::{self};
+use fig2img::commands::download::DownloadOptions;
+use fig2img::commands::{self};
 
 #[tokio::main]
 async fn main() {
