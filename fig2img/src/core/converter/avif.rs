@@ -1,60 +1,89 @@
-use std::io::{Error, ErrorKind};
-
-use image::{DynamicImage, GenericImageView};
-use ravif::{Encoder, Img};
-use rgb::FromSlice;
+use std::io::Error;
+use std::process::Command;
 
 pub(super) struct AvifConverter;
 
 impl AvifConverter {
   pub async fn convert(input_path: &str, output_path: &str) -> Result<bool, Error> {
-    let input_path = input_path.to_string();
-    let output_path = output_path.to_string();
-
-    let encoded = tokio::task::spawn_blocking(move || {
-      image::open(&input_path)
-        .map_err(|e| Error::new(ErrorKind::InvalidData, e))
-        .and_then(Self::encode_image)
-    })
-    .await
-    .map_err(|e| Error::new(ErrorKind::Other, e))??;
-
-    tokio::fs::write(output_path, encoded.as_slice()).await?;
-    Ok(true)
+    Self::convert_inner(input_path, output_path)
   }
 
-  fn encode_image(img: DynamicImage) -> Result<Vec<u8>, Error> {
-    let (width, height) = img.dimensions();
-    let rgba = img.to_rgba8();
-    let pixels = rgba.as_raw();
+  fn convert_inner(input_path: &str, output_path: &str) -> Result<bool, Error> {
+    if !Self::check_avifenc_installed() {
+      Self::print_installation_guide();
+      return Ok(false);
+    }
 
-    let encoded = Encoder::new()
-      .with_quality(80.0)
-      .with_alpha_quality(80.0)
-      .with_speed(8)
-      .encode_rgba(Img::new(pixels.as_rgba(), width as usize, height as usize))
-      .unwrap();
+    let status = Command::new("avifenc")
+      .arg("-q")
+      .arg("0..51")
+      .arg("--speed")
+      .arg("8")
+      .arg("--yuv")
+      .arg("444")
+      .arg(input_path)
+      .arg(output_path)
+      .status()?;
 
-    Ok(encoded.avif_file)
+    Ok(status.success())
+  }
+
+  fn check_avifenc_installed() -> bool {
+    Command::new("avifenc")
+      .arg("--version")
+      .output()
+      .map_or(false, |output| output.status.success())
+  }
+
+  fn print_installation_guide() {
+    println!("avifenc is not installed. Please install it:");
+    println!("macOS: brew install libavif");
+    println!("Or visit: https://github.com/AOMediaCodec/libavif");
   }
 }
 
 #[cfg(test)]
 mod tests {
+  use std::path::Path;
+
+  use tempfile::NamedTempFile;
+
   use super::*;
 
-  #[test]
-  fn test_encode_image() {
-    let img = DynamicImage::ImageRgba8(image::RgbaImage::new(100, 100));
-    let result = AvifConverter::encode_image(img);
-    assert!(result.is_ok());
+  fn create_test_image() -> NamedTempFile {
+    let temp_file = NamedTempFile::new().unwrap();
+    let mut img = image::RgbaImage::new(100, 100);
 
-    let result = result.unwrap();
-    assert!(result.len() > 0);
-    assert_eq!(&result[4..8], b"ftyp");
+    for pixel in img.pixels_mut() {
+      *pixel = image::Rgba([255, 0, 0, 255]);
+    }
+
+    let img = image::DynamicImage::ImageRgba8(img);
+    img
+      .save_with_format(temp_file.path(), image::ImageFormat::Png)
+      .unwrap();
+    temp_file
   }
 
-  // TODO: Uncomment and fix the async test when the conversion issue is resolved
-  // #[tokio::test]
-  // async fn test_avif_conversion() { ... }
+  #[tokio::test]
+  async fn test_avif_conversion() {
+    let input_file = create_test_image();
+    let output_file = NamedTempFile::new().unwrap();
+
+    let checked_avifenc = AvifConverter::check_avifenc_installed();
+    assert!(checked_avifenc, "❌ avifenc is not installed");
+
+    let result = AvifConverter::convert(
+      input_file.path().to_str().unwrap(),
+      output_file.path().to_str().unwrap(),
+    )
+    .await;
+
+    assert!(result.is_ok(), "❌ Conversion failed: {:?}", result.err());
+    assert!(result.unwrap(), "❌ Conversion returned false");
+    assert!(
+      Path::new(output_file.path()).exists(),
+      "❌ Output file does not exist"
+    );
+  }
 }

@@ -20,9 +20,10 @@ reqwest = { version = "0.12.12", features = ["json", "blocking"] }
 serde = "1.0.218"
 serde_json = "1.0.139"
 futures = "0.3.31"
-ravif = "0.11.11"
-rgb = "0.8.50"
+# ravif = "0.11.11"
+# rgb = "0.8.50"
 image = "0.25.5"
+# tempfile = "3.17.1"
 tokio.workspace = true
 
 [dev-dependencies]
