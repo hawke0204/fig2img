@@ -1,12 +1,12 @@
 # fig2img
 
-[한국어](./README.ko.md)
+[English](./README.md)
 
 ### Features
 
-- Download Figma image nodes
-- Convert PNG to WebP
-- Convert PNG to AVIF
+- Figma 이미지 노드 다운로드
+- PNG를 WebP로 변환
+- PNG를 AVIF로 변환
 
 ### Supported OS
 
@@ -16,16 +16,16 @@
 
 #### Installation
 
-1. Download the latest release from GitHub Releases page
-2. You can either:
-   - Run the executable from the downloaded location using the usage instructions below
-   - Move it to `/usr/local/bin` to run it from anywhere in your system
+1. GitHub Releases 페이지에서 최신 버전을 다운로드
+2. 다음 중 하나의 방법으로 사용할 수 있습니다:
+   - 다운로드 받은 위치에서 아래 사용법에 따라 실행
+   - `/usr/local/bin`으로 이동하여 시스템 어디서나 실행 가능하게 설정
 
-> Note: On macOS, you might need to grant security permissions to run the executable.
+> 참고: macOS에서는 실행 파일을 실행하기 위해 보안 권한을 부여해야 할 수 있습니다.
 
 #### Environment Setup
 
-Set up your environment variables:
+환경 변수를 설정하세요:
 
 ```bash
 # fig2img
