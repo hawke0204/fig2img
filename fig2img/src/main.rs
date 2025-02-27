@@ -11,15 +11,15 @@ async fn main() {
   let cli = Cli::parse();
 
   match cli.command {
-    Commands::Download { download_dir } => {
-      commands::download::execute(download_dir, DownloadOptions::default()).await;
+    Commands::Download { output } => {
+      commands::download::execute(output, DownloadOptions::default()).await;
     }
     Commands::Convert {
-      input_dir,
-      output_dir,
+      input,
+      output,
       format,
     } => {
-      commands::convert::execute(input_dir, output_dir, format).await;
+      commands::convert::execute(input, output, format).await;
     }
   }
 }

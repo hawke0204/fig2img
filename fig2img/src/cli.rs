@@ -15,14 +15,14 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
   Download {
-    #[arg(long, default_value = "./downloads")]
-    download_dir: PathBuf,
+    #[arg(long)]
+    output: PathBuf,
   },
   Convert {
-    #[arg(long, default_value = "./downloads")]
-    input_dir: PathBuf,
-    #[arg(long, default_value = "./output")]
-    output_dir: PathBuf,
+    #[arg(long)]
+    input: PathBuf,
+    #[arg(long)]
+    output: PathBuf,
     #[arg(long, default_value = "webp")]
     format: String,
   },

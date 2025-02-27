@@ -22,12 +22,13 @@ export FIGMA_FILE_KEY="YOUR_FILE_KEY"
 #### Download Images
 
 ```bash
-fig2img download --download_dir ./downloads
+fig2img download --output "YOUR_DIRECTORY"
 ```
 
 #### Convert Images
 
 ```bash
-fig2img convert --format webp
-fig2img convert --format avif
+fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY"
+fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format webp
+fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format avif
 ```
