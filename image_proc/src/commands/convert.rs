@@ -53,11 +53,7 @@ pub async fn execute(input_dir: PathBuf, output_dir: PathBuf, format: String) {
         }
       }
 
-      if let Err(e) = future::join_all(conversion_tasks)
-        .await
-        .into_iter()
-        .collect::<Result<Vec<_>, _>>()
-      {
+      if let Err(e) = future::try_join_all(conversion_tasks).await {
         eprintln!("[❌] Some conversions failed: {}", e);
       }
     }
