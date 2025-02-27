@@ -34,8 +34,8 @@ impl WebPConverter {
   fn print_installation_guide() {
     println!("cwebp is not installed. Please install it:");
     println!("macOS: brew install webp");
-    println!("Ubuntu: sudo apt-get install webp");
-    println!("Windows: choco install webp");
+    // println!("Ubuntu: sudo apt-get install webp");
+    // println!("Windows: choco install webp");
     println!("Or download from: https://developers.google.com/speed/webp/download");
   }
 }
