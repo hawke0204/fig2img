@@ -28,6 +28,9 @@ jobs:
         run: |
           VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="fig2img") | .version')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
 
       - name: Build Project
         run: cargo build --release -p fig2img
@@ -57,7 +60,7 @@ jobs:
       - name: Update Homebrew Formula
         run: |
           FORMULA_PATH=Formula/fig2img.rb
-          VERSION=${{ env.VERSION }}
+          VERSION=${{ needs.release.outputs.version }}
           URL="https://github.com/geonhyeoklee/fig2img/releases/download/v${VERSION}/fig2img-macos-${VERSION}.tar.gz"
           SHA256=$(curl -Ls $URL | shasum -a 256 | awk '{print $1}')
 
@@ -80,5 +83,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Formula/fig2img.rb
-          git commit -m "Update fig2img to version ${{ env.VERSION }}"
+          git commit -m "Update fig2img to version ${{ needs.release.outputs.version }}"
           git push
