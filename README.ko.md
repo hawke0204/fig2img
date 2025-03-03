@@ -16,6 +16,19 @@
 
 #### Installation
 
+Homebrew를 사용하여 설치할 수 있습니다:
+
+```bash
+brew tap geonhyeoklee/fig2img
+brew install fig2img
+```
+
+설치 확인:
+```bash
+fig2img --version
+```
+
+또는 다음 방법으로도 설치할 수 있습니다:
 1. GitHub Releases 페이지에서 최신 버전을 다운로드
 2. 다음 중 하나의 방법으로 사용할 수 있습니다:
    - 다운로드 받은 위치에서 아래 사용법에 따라 실행
@@ -49,3 +62,4 @@ fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY"
 fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format webp
 fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format avif
 ```
+````
