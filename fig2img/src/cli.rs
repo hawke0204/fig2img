@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "fitool")]
+#[command(name = "fig2img")]
 #[command(author = "GeonHyeok Lee")]
 #[command(version = "0.0.1")]
 #[command(about = "Downloads images from Figma and converts them to WebP", long_about = None)]
