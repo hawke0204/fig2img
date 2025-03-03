@@ -10,6 +10,9 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: macos-latest # macOS 바이너리를 빌드하기 위해 macOS 환경에서 실행
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
