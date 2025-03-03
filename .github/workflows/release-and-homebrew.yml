@@ -1,0 +1,88 @@
+name: Release and Update Homebrew
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true
+    runs-on: macos-latest # macOS 바이너리를 빌드하기 위해 macOS 환경에서 실행
+
+    permissions:
+      contents: write
+
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="fig2img") | .version')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build Project
+        run: cargo build --release -p fig2img
+
+      - name: Create Archive
+        run: tar -czvf fig2img-macos-${{ env.VERSION }}.tar.gz -C target/release fig2img
+
+      - name: Create GitHub Release
+        run: |
+          gh release create v${{ env.VERSION }} fig2img-macos-${{ env.VERSION }}.tar.gz \
+            --title "Release v${{ env.VERSION }}" \
+            --notes "Auto-generated release from PR merge."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-homebrew:
+    needs: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Homebrew Tap Repository
+        uses: actions/checkout@v3
+        with:
+          repository: geonhyeoklee/homebrew-fig2img
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+      - name: Update Homebrew Formula
+        run: |
+          FORMULA_PATH=Formula/fig2img.rb
+          VERSION=${{ needs.release.outputs.version }}
+          URL="https://github.com/geonhyeoklee/fig2img/releases/download/v${VERSION}/fig2img-macos-${VERSION}.tar.gz"
+          SHA256=$(curl -Ls $URL | shasum -a 256 | awk '{print $1}')
+
+          cat > $FORMULA_PATH <<EOF
+          class Fig2img < Formula
+            desc "A tool to convert Figma files to images"
+            homepage "https://github.com/geonhyeoklee/fig2img"
+            url "$URL"
+            sha256 "$SHA256"
+            version "$VERSION"
+
+            def install
+              bin.install "fig2img"
+            end
+          end
+          EOF
+
+      - name: Commit and Push Formula Update
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/fig2img.rb
+          git commit -m "Update fig2img to version ${{ needs.release.outputs.version }}"
+          git push
