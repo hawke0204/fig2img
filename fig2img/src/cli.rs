@@ -5,8 +5,8 @@ use clap::{Parser, Subcommand};
 #[derive(Parser)]
 #[command(name = "fig2img")]
 #[command(author = "GeonHyeok Lee")]
-#[command(version = "0.0.1")]
-#[command(about = "Downloads images from Figma and converts them to WebP", long_about = None)]
+#[command(version = env!("CARGO_PKG_VERSION"))]
+#[command(about = "Downloads images from figma and Convert them to another format", long_about = None)]
 pub struct Cli {
   #[command(subcommand)]
   pub command: Commands,
