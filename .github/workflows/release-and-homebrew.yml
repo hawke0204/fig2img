@@ -13,6 +13,9 @@ jobs:
     permissions:
       contents: write
 
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,8 +32,6 @@ jobs:
           VERSION=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="fig2img") | .version')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
 
       - name: Build Project
         run: cargo build --release -p fig2img
