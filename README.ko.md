@@ -91,3 +91,7 @@ flowchart TB
    class Format decision;
    class WebP,AVIF io;
 ```
+
+### Benchmark Results
+
+벤치마크 결과는 [benchmark_results.csv](./benchmarks/benchmark_results.csv)를 참조하면 되요.
