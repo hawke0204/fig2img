@@ -4,5 +4,8 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
+chrono = "0.4.40"
 fig2img = { path = "../fig2img" }
 tokio.workspace = true
+colored = "2.2.0"
+cli-table = "0.4.9"
