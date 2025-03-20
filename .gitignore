@@ -13,3 +13,5 @@ config.toml
 # Execute output
 output
 downloads
+
+.DS_Store
