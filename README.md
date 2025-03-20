@@ -62,3 +62,32 @@ fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY"
 fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format webp
 fig2img convert --input "YOUR_DIRECTORY" --output "YOUR_DIRECTORY" --format avif
 ```
+
+### How it works
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 40, 'htmlLabels': true, 'diagramPadding': 10}}}%%
+flowchart TB
+   Start([Start]) --> Download[Download Process]
+   Download --> Convert[Convert Process]
+   Convert --> End([End])
+
+   subgraph "Download Process"
+      direction TB
+      API[Figma API] --> Images[Download Images]
+   end
+
+   subgraph "Convert Process"
+      direction TB
+      Format{Format} -->|WebP| WebP[WebP Output]
+      Format -->|AVIF| AVIF[AVIF Output]
+   end
+
+   classDef process fill:#e1f5fe,stroke:#333,stroke-width:1px;
+   classDef decision fill:#fff8e1,stroke:#333,stroke-width:1px;
+   classDef io fill:#e8f5e9,stroke:#333,stroke-width:1px;
+
+   class API,Images process;
+   class Format decision;
+   class WebP,AVIF io;
+```
